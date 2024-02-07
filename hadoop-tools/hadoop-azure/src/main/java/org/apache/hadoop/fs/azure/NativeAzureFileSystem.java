@@ -160,9 +160,13 @@ public class NativeAzureFileSystem extends FileSystem {
 
       // open redo file
       Path f = redoFile;
+	  int l;
+      byte[] bytes;
       FSDataInputStream input = fs.open(f);
-      byte[] bytes = new byte[MAX_RENAME_PENDING_FILE_SIZE];
-      int l = input.read(bytes);
+	  try (FSDataInputStream input = fs.open(f)) {
+        bytes = new byte[MAX_RENAME_PENDING_FILE_SIZE];
+        l = input.read(bytes);
+      }
       if (l <= 0) {
         // Jira HADOOP-12678 -Handle empty rename pending metadata file during
         // atomic rename in redo path. If during renamepending file is created
